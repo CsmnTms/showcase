@@ -39,19 +39,18 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Build & Export
+      - name: Build & Prepare Pages artifact
         env:
           NEXT_PUBLIC_BASE_PATH: "/showcase"
           NEXT_PUBLIC_API_BASE_URL: "https://google.com/"
           NEXT_PUBLIC_SITE_URL: "https://csmntms.github.io/showcase"
         run: |
           pnpm --dir apps/web run build
-          pnpm --dir apps/web run export
-          # 1) Disable Jekyll (keeps _next/ assets)
+          # Create .nojekyll so _next/ assets are served
           printf '' > apps/web/out/.nojekyll
-          # 2) SPA fallback so deep links work
+          # SPA fallback so deep links work
           cp apps/web/out/index.html apps/web/out/404.html
-          # 3) Debug
+          # Debug
           ls -la apps/web/out
 
       - name: Upload Pages artifact
