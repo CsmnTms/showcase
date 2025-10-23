@@ -42,7 +42,7 @@ jobs:
       - name: Build & Prepare Pages artifact
         env:
           NEXT_PUBLIC_BASE_PATH: "/showcase"
-          NEXT_PUBLIC_API_BASE_URL: "https://google.com/"
+          NEXT_PUBLIC_API_BASE_URL: "https://showcase.icyglacier-8096fe38.westeurope.azurecontainerapps.io"
           NEXT_PUBLIC_SITE_URL: "https://csmntms.github.io/showcase"
         run: |
           pnpm --dir apps/web run build

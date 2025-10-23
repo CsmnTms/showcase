@@ -2,35 +2,51 @@ using Api.Core.Abstractions;
 using Api.Core.Projects;
 using Api.Core.Projects.Specs;
 using Api.Infrastructure;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
-var b = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 // Serilog
-b.Host.UseSerilog((ctx, lc) => lc.ReadFrom.Configuration(ctx.Configuration).WriteTo.Console());
+builder.Host.UseSerilog((ctx, lc) => lc.ReadFrom.Configuration(ctx.Configuration).WriteTo.Console());
 
 // Services
-b.Services.AddEndpointsApiExplorer();
-b.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-b.Services.AddDbContext<AppDbContext>(o =>
-    o.UseSqlite(b.Configuration.GetConnectionString("db") ?? "Data Source=app.db"));
+builder.Services.AddDbContext<AppDbContext>(o =>
+    o.UseSqlite(builder.Configuration.GetConnectionString("db") ?? "Data Source=app.db"));
 
-b.Services.AddScoped(typeof(IReadRepository<>), typeof(EfReadRepository<>));
-b.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
-b.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
+builder.Services.AddScoped(typeof(IReadRepository<>), typeof(EfReadRepository<>));
+builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
-b.Services.AddCors(o => o.AddPolicy("site", p =>
-    p.WithOrigins(b.Configuration["AllowedOrigin"] ?? "http://localhost:3000")
-     .AllowAnyHeader().AllowAnyMethod()));
+// CORS
+const string CorsPolicy = "AllowWeb";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: CorsPolicy, policy =>
+    {
+        policy
+            .WithOrigins(
+                "https://csmntms.github.io", // GitHub Pages origin
+                "http://localhost:3000"      // local Next.js dev
+            )
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            // If you authenticate with cookies across origins, keep this:
+            .AllowCredentials();
+            // If you use bearer tokens instead of cookies, remove .AllowCredentials()
+    });
+});
 
-var app = b.Build();
+var app = builder.Build();
 
 app.UseSerilogRequestLogging();
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseCors("site");
+app.UseCors(CorsPolicy);
 
 // Ensure DB + seed
 using (var scope = app.Services.CreateScope())
