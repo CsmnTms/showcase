@@ -16,7 +16,7 @@ env:
   RESOURCE_GROUP: showcase
   CONTAINERAPPS_ENV: showcase-env           # change if yours has a different name
   CONTAINERAPP_NAME: showcase-api           # your actual Container App name
-  IMAGE_NAME: ghcr.io/${{ github.repository }}/api:latest
+  IMAGE_NAME: ghcr.io/${{ github.repository | toLowerCase }}/api:latest
   ALLOWED_ORIGIN: https://csmntms.github.io
   TARGET_PORT: 8080
 
