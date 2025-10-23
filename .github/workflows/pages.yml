@@ -41,18 +41,18 @@ jobs:
 
       - name: Build & Export
         env:
-          # For a project page: "/<repo>"
           NEXT_PUBLIC_BASE_PATH: "/showcase"
-          # Public HTTPS URL of your running API (NOT localhost)
-          NEXT_PUBLIC_API_BASE_URL: "https://google.com/" 
-          NEXT_PUBLIC_SITE_URL: "https://CsmnTms.github.io/showcase"
+          NEXT_PUBLIC_API_BASE_URL: "https://google.com/"
+          NEXT_PUBLIC_SITE_URL: "https://csmntms.github.io/showcase"
         run: |
-          pnpm -C apps/web build
-          pnpm -C apps/web export
+          pnpm --dir apps/web run build
+          pnpm --dir apps/web run export
           # 1) Disable Jekyll (keeps _next/ assets)
-          echo > apps/web/out/.nojekyll
+          printf '' > apps/web/out/.nojekyll
           # 2) SPA fallback so deep links work
           cp apps/web/out/index.html apps/web/out/404.html
+          # 3) Debug
+          ls -la apps/web/out
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
