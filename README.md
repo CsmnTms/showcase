@@ -1,4 +1,4 @@
-# Showcase — Full-Stack Portfolio Playground
+# Showcase℠ — Full-Stack Portfolio Playground
 
 **Stack**
 - 🟦 **.NET 10** — Minimal API, EF Core 10, Ardalis.Specification  

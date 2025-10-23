@@ -24,3 +24,40 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Base */
+@layer base {
+  :root { color-scheme: light dark; }
+  html { text-rendering: optimizeLegibility; }
+  body { @apply bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 antialiased; }
+}
+
+/* Component primitives */
+@layer components {
+  .nav-link {
+    @apply text-sm text-zinc-700 dark:text-zinc-200 transition-colors hover:text-zinc-900 dark:hover:text-white;
+  }
+  .subtitle {
+    @apply text-[10px] sm:text-xs md:text-sm leading-none text-zinc-500 dark:text-zinc-400 transition-colors group-hover:text-zinc-700 dark:group-hover:text-zinc-200;
+  }
+  .icon-btn {
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-md border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-200 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-950;
+  }
+  .menu {
+    @apply absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-md border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-900;
+  }
+  .menu-item {
+    @apply px-3 py-2 text-zinc-700 hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800 transition-colors;
+  }
+  .header-surface {
+    @apply sticky top-0 z-50 border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80 supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-zinc-950/60;
+  }
+
+    /* Bottom-align the two title lines */
+  .brand {
+    @apply inline-flex items-end gap-2 leading-none;
+  }
+  .brand-title {
+    @apply text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight leading-none;
+  }
+}

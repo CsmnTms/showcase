@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint",
+    "serve": "npx serve out -l 3000"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.5",

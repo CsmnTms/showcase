@@ -1,0 +1,64 @@
+name: Deploy GitHub Pages (apps/web)
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "apps/web/**"
+      - ".github/workflows/pages.yml"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install deps
+        run: pnpm -C apps/web install --frozen-lockfile
+
+      - name: Build & Export
+        env:
+          # For a project page: "/<repo>"
+          NEXT_PUBLIC_BASE_PATH: "/showcase"
+          # Public HTTPS URL of your running API (NOT localhost)
+          NEXT_PUBLIC_API_BASE_URL: "https://google.com/" 
+          NEXT_PUBLIC_SITE_URL: "https://CsmnTms.github.io/showcase"
+        run: |
+          pnpm -C apps/web build
+          pnpm -C apps/web export
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/web/out
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
