@@ -421,7 +421,6 @@ FodyWeavers.xsd
 
 # Node / pnpm
 node_modules/
-pnpm-lock.yaml
 .next/
 dist/
 .vercel/
