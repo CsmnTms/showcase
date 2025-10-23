@@ -1,0 +1,64 @@
+name: Deploy API to Azure Container Apps
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "apps/api/**"
+      - ".github/workflows/api-aca.yml"
+
+permissions:
+  contents: read
+  id-token: write
+  packages: write
+
+env:
+  RESOURCE_GROUP: showcase
+  CONTAINERAPPS_ENV: showcase-env           # change if yours has a different name
+  CONTAINERAPP_NAME: showcase-api           # your actual Container App name
+  IMAGE_NAME: ghcr.io/${{ github.repository }}/api:latest
+  ALLOWED_ORIGIN: https://csmntms.github.io
+  TARGET_PORT: 8080
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: apps/api
+          push: true
+          tags: ${{ env.IMAGE_NAME }}
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Azure Container Apps
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          resourceGroup: ${{ env.RESOURCE_GROUP }}
+          containerAppName: ${{ env.CONTAINERAPP_NAME }}
+          containerAppEnvironment: ${{ env.CONTAINERAPPS_ENV }}
+          imageToDeploy: ${{ env.IMAGE_NAME }}
+          targetPort: ${{ env.TARGET_PORT }}
+          ingress: external
+          environmentVariables: |
+            ASPNETCORE_URLS=http://0.0.0.0:${{ env.TARGET_PORT }}
+            AllowedOrigin=${{ env.ALLOWED_ORIGIN }}
