@@ -416,3 +416,24 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+####################### CUSTOM BELOW #######################
+
+# Node / pnpm
+node_modules/
+pnpm-lock.yaml
+.next/
+dist/
+.vercel/
+.env*
+
+# mac/win
+.DS_Store
+Thumbs.db
+
+# .NET
+[Bb]in/
+[Oo]bj/
+*.user
+*.db
+app.db

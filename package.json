@@ -1,0 +1,8 @@
+{
+    "name": "Showcase",
+    "private": true,
+    "scripts": {
+        "dev": "make dev",
+        "web:build": "pnpm -C apps/web build"
+    }
+}
