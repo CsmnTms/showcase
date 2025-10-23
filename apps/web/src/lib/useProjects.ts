@@ -3,6 +3,7 @@ import type { Project } from './types';
 
 export function useProjects() {
   const base = process.env.NEXT_PUBLIC_API_BASE_URL!;
+  
   return useQuery({
     queryKey: ['projects'],
     queryFn: async (): Promise<Project[]> => {

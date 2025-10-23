@@ -1,0 +1,16 @@
+[
+  {
+    "slug": "my-backend-is-still-work-in-progress",
+    "title": "my backend is still work in progress",
+    "summary": "If my backend is still work in progress, you will see this.",
+    "tech": ["Backend", "Work in Progress"],
+    "tags": ["wip"]
+  },
+  {
+    "slug": "placeholder",
+    "title": "Placeholder Project",
+    "summary": "Fallback data to keep the grid populated.",
+    "tech": ["placholder tech", "hold in place technology"],
+    "tags": ["fallback"]
+  }
+]
