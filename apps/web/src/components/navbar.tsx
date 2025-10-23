@@ -33,7 +33,7 @@ export default function Navbar() {
             <span className="brand-title">
               ^showcase
             </span>
-            <span className="subtitle">by Tămas Cosmin</span>
+            <span className="subtitle">by Tămaș Cosmin</span>
           </span>
         </Link>
 
