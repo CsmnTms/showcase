@@ -36,6 +36,9 @@ jobs:
       - name: Install deps
         run: pnpm -C apps/web install --frozen-lockfile
 
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
       - name: Build & Export
         env:
           # For a project page: "/<repo>"
@@ -46,6 +49,10 @@ jobs:
         run: |
           pnpm -C apps/web build
           pnpm -C apps/web export
+          # 1) Disable Jekyll (keeps _next/ assets)
+          echo > apps/web/out/.nojekyll
+          # 2) SPA fallback so deep links work
+          cp apps/web/out/index.html apps/web/out/404.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
