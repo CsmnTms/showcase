@@ -61,3 +61,20 @@ body {
     @apply text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight leading-none;
   }
 }
+
+/* VS Code-like scrollbars for editor textareas (global to avoid hydration issues) */
+textarea.editor::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+textarea.editor::-webkit-scrollbar-thumb {
+  background: #3c3c3c;
+  border-radius: 6px;
+}
+textarea.editor::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+/* Firefox */
+textarea.editor {
+  scrollbar-color: #3c3c3c #1e1e1e;
+}

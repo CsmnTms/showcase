@@ -3,7 +3,7 @@ import Navbar from '@/components/navbar';
 import Providers from './providers';
 
 export const metadata = {
-  title: 'Your Name — .NET Engineer',
+  title: '^showcase',
   description: 'Clean architecture backends & thoughtful frontends.',
 };
 

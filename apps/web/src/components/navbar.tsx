@@ -6,15 +6,23 @@ import { useEffect, useRef, useState } from 'react';
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const toolsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
+      const target = e.target as Node;
+      const clickedOutsideMobile = menuRef.current && !menuRef.current.contains(target);
+      const clickedOutsideTools = toolsRef.current && !toolsRef.current.contains(target);
+      // If clicking outside either menu, close them.
+      if (clickedOutsideMobile) setMenuOpen(false);
+      if (clickedOutsideTools) setToolsOpen(false);
     }
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setMenuOpen(false);
+      if (e.key === 'Escape') {
+        setMenuOpen(false);
+        setToolsOpen(false);
+      }
     }
     document.addEventListener('mousedown', onClickOutside);
     document.addEventListener('keydown', onKey);
@@ -40,7 +48,33 @@ export default function Navbar() {
         {/* Desktop */}
         <nav className="hidden md:flex items-center gap-6">
           <Link href="/portfolio" className="nav-link">Portfolio</Link>
-          <Link href="/blog" className="nav-link">Blog</Link>
+          {/* Replaced Blog with Tools dropdown */}
+          <div ref={toolsRef} className="relative">
+            <button
+              type="button"
+              className="nav-link inline-flex items-center gap-1"
+              aria-haspopup="menu"
+              aria-expanded={toolsOpen}
+              aria-controls="desktop-tools-menu"
+              onClick={() => setToolsOpen(o => !o)}
+            >
+              Tools
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                <path strokeWidth="2" strokeLinecap="round" d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+            {toolsOpen && (
+              <div id="desktop-tools-menu" className="menu">
+                <div className="flex flex-col py-1">
+                  {/* JSON Formatter routes to /json-formatter as requested */}
+                  <Link href="/json-formatter" className="menu-item" onClick={() => setToolsOpen(false)}>
+                    JSON Formatter
+                  </Link>
+                  {/* Future tools can be added here */}
+                </div>
+              </div>
+            )}
+          </div>
           <Link href="/about" className="nav-link">About</Link>
         </nav>
 
@@ -71,7 +105,10 @@ export default function Navbar() {
             {menuOpen && (
               <div id="mobile-menu" className="menu">
                 <div className="flex flex-col py-1">
-                  <Link href="/blog" className="menu-item" onClick={() => setMenuOpen(false)}>Blog</Link>
+                  {/* Show tools directly as items on mobile */}
+                  <span className="px-3 py-1 text-xs font-medium text-neutral-500">Tools</span>
+                  <Link href="/json-formatter" className="menu-item" onClick={() => setMenuOpen(false)}>JSON Formatter</Link>
+                  <div className="h-px bg-neutral-200 my-1" />
                   <Link href="/about" className="menu-item" onClick={() => setMenuOpen(false)}>About</Link>
                 </div>
               </div>
