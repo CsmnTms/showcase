@@ -12,17 +12,17 @@ var builder = WebApplication.CreateBuilder(args);
 // Logging
 builder.Host.UseSerilog((ctx, lc) => lc.ReadFrom.Configuration(ctx.Configuration).WriteTo.Console());
 
-// Global CORS (default policy)
+// CORS (global default)
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
         policy.WithOrigins(
-                "https://csmntms.github.io", // GitHub Pages origin
-                "http://localhost:3000"      // local dev
+                "https://csmntms.github.io",
+                "http://localhost:3000"
             )
             .AllowAnyMethod()
             .AllowAnyHeader()
-            // .AllowCredentials() // only if you use cookies
+            // .AllowCredentials() // only if you use cookie auth
     );
 });
 
@@ -38,37 +38,20 @@ builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
 var app = builder.Build();
 
+// Add a fingerprint header to every response
+app.Use(async (ctx, next) =>
+{
+    ctx.Response.Headers["x-app"] = "showcase-api";
+    await next();
+});
+
 // Forwarded headers (ACA)
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
-// TEMP: emit CORS even on 404 to diagnose in-browser
-app.Use(async (ctx, next) =>
-{
-    var origin = ctx.Request.Headers.Origin.ToString();
-    if (!string.IsNullOrEmpty(origin) &&
-        (origin == "https://csmntms.github.io" || origin == "http://localhost:3000"))
-    {
-        ctx.Response.Headers["Access-Control-Allow-Origin"] = origin;
-        ctx.Response.Headers["Vary"] = "Origin";
-        ctx.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization";
-        ctx.Response.Headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,PATCH,DELETE,OPTIONS";
-        // ctx.Response.Headers["Access-Control-Allow-Credentials"] = "true"; // if cookies
-    }
-    if (ctx.Request.Method == "OPTIONS")
-    {
-        ctx.Response.StatusCode = 200;
-        await ctx.Response.CompleteAsync();
-        return;
-    }
-    await next();
-});
-
-// Global CORS
-app.UseCors();
-
+app.UseCors(); // global
 app.UseSerilogRequestLogging();
 
 app.UseSwagger();
@@ -78,7 +61,7 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger";
 });
 
-// Sanity endpoints (verify you’re hitting your app)
+// Sanity endpoints (must return JSON bodies)
 app.MapGet("/", () => Results.Json(new { ok = true, name = "showcase-api" }));
 app.MapGet("/health", () => Results.Json(new { status = "ok" }));
 app.MapGet("/routes", (EndpointDataSource eds) =>
