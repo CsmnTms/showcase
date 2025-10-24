@@ -48,6 +48,31 @@ builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
 var app = builder.Build();
 
+// DB init (create schema; migrate if migrations exist, else EnsureCreated)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var hasMigrations = db.Database.GetMigrations().Any();
+
+    if (hasMigrations)
+        await db.Database.MigrateAsync();
+    else
+        await db.Database.EnsureCreatedAsync();
+
+    if (!await db.Set<Project>().AnyAsync())
+    {
+        db.Add(new Project
+        {
+            Slug = "hello-world",
+            Title = "Hello World",
+            Summary = "Seed project",
+            Tags = new[] { "sample" },
+            Tech = new[] { "ASP.NET Core", "SQLite" }
+        });
+        await db.SaveChangesAsync();
+    }
+}
+
 // Add a fingerprint header to every response
 app.Use(async (ctx, next) =>
 {
