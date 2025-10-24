@@ -30,55 +30,37 @@ builder.Services.AddCors(options =>
     {
         policy
             .WithOrigins(
-                "https://csmntms.github.io", // GitHub Pages origin
+                "https://csmntms.github.io", // GitHub Pages origin (no path)
                 "http://localhost:3000"      // local Next.js dev
             )
             .AllowAnyMethod()
-            .AllowAnyHeader()
-            // If you authenticate with cookies across origins, keep this:
-            .AllowCredentials();
-            // If you use bearer tokens instead of cookies, remove .AllowCredentials()
+            .AllowAnyHeader();
+            // .AllowCredentials(); // remove if you use bearer tokens, keep if cookies
     });
 });
 
 var app = builder.Build();
 
+// Order: CORS before endpoints
 app.UseSerilogRequestLogging();
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseCors(CorsPolicy);
 
-// Ensure DB + seed
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.MigrateAsync();
+// Map endpoints with explicit RequireCors (ensures policy applies)
+var api = app.MapGroup("/").RequireCors(CorsPolicy);
 
-    if (!await db.Projects.AnyAsync())
-    {
-        db.Projects.Add(new Project
-        {
-            Slug = "clean-architecture-blueprint",
-            Title = ".NET 10 Clean Architecture",
-            Summary = "Pragmatic, mapper-free, MediatR-free blueprint.",
-            Tags = [".NET", "Clean Architecture"],
-            Tech = ["EF Core 10", "Docker"]
-        });
-        await db.SaveChangesAsync();
-    }
-}
-
-// Endpoints
-app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
-
-app.MapGet("/projects", async (IReadRepository<Project> repo) =>
+api.MapGet("/health", () => Results.Ok(new { status = "ok" }));
+api.MapGet("/projects", async (IReadRepository<Project> repo) =>
     Results.Ok(await repo.ListAsync()));
-
-app.MapGet("/projects/{slug}", async (string slug, IReadRepository<Project> repo) =>
+api.MapGet("/projects/{slug}", async (string slug, IReadRepository<Project> repo) =>
 {
     var spec = new ProjectBySlugSpec(slug);
     var proj = await repo.FirstOrDefaultAsync(spec);
     return proj is null ? Results.NotFound() : Results.Ok(proj);
 });
+
+// Optional: handle preflight explicitly (defensive)
+api.MapMethods("/{**any}", new[] { "OPTIONS" }, () => Results.Ok());
 
 app.Run();
