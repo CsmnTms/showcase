@@ -6,8 +6,12 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Force Kestrel to bind 8080 and ignore ASPNETCORE_URLS
+builder.WebHost.ConfigureKestrel(o => o.ListenAnyIP(8080));
 
 // Logging
 builder.Host.UseSerilog((ctx, lc) => lc.ReadFrom.Configuration(ctx.Configuration).WriteTo.Console());
@@ -29,8 +33,14 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<AppDbContext>(o =>
-    o.UseSqlite(builder.Configuration.GetConnectionString("db") ?? "Data Source=app.db"));
+// SQLite in writable path by default (works in ACA)
+var sqlite = builder.Configuration.GetConnectionString("db");
+if (string.IsNullOrWhiteSpace(sqlite))
+{
+    var file = Path.Combine(Path.GetTempPath(), "app.db"); // /tmp/app.db
+    sqlite = $"Data Source={file}";
+}
+builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlite(sqlite));
 
 builder.Services.AddScoped(typeof(IReadRepository<>), typeof(EfReadRepository<>));
 builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
