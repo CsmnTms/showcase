@@ -1,3 +1,5 @@
+// this too?
+
 'use client';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { useProjects } from '@/lib/useProjects';
@@ -66,11 +68,11 @@ export default function PortfolioPage() {
     <>
       {showFallbackBanner && (
         <div className="mx-auto max-w-6xl px-6 pt-4">
-          <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-amber-800 dark:border-amber-600/50 dark:bg-amber-900/20 dark:text-amber-200">
+          <div className="alert-warn">
             Showing cached/fallback data.
             <button
               onClick={() => location.reload()}
-              className="ml-3 inline-flex items-center rounded px-2 py-1 text-xs font-medium text-amber-900 hover:bg-amber-100 dark:text-amber-100 dark:hover:bg-amber-900/40"
+              className="btn btn-amber ml-3 px-2 py-1 text-xs"
             >
               Retry
             </button>
@@ -78,7 +80,7 @@ export default function PortfolioPage() {
         </div>
       )}
 
-      <main className="mx-auto grid max-w-6xl gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
+      <main className="grid-cards">
         {viewData.map((p) => (
           <ProjectCard
             key={p.slug}

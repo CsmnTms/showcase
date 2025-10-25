@@ -13,20 +13,20 @@ export default function ProjectCard({ title, summary, tech = [], tags = [], href
   return (
     <Wrapper
       {...(href ? { href } : {})}
-      className="block rounded-2xl border p-6 transition-shadow hover:shadow-md"
+      className="block card-lg card-hover"
     >
       <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="mt-2 text-sm text-neutral-600">{summary}</p>
+      <p className="mt-2 text-sm muted">{summary}</p>
 
       {(tech.length > 0 || tags.length > 0) && (
         <div className="mt-4 flex flex-wrap gap-2">
           {tech.map((t) => (
-            <span key={t} className="rounded bg-neutral-100 px-2 py-1 text-xs">
+            <span key={t} className="badge">
               {t}
             </span>
           ))}
           {tags.map((t) => (
-            <span key={t} className="rounded bg-neutral-50 px-2 py-1 text-xs ring-1 ring-neutral-200">
+            <span key={t} className="tag">
               {t}
             </span>
           ))}
