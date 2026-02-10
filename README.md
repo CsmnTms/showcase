@@ -1,14 +1,11 @@
 # Showcase℠ — Full-Stack Portfolio Playground
 
 **Stack**
-- 🟦 **.NET 10** — Minimal API, EF Core 10, Ardalis.Specification  
-- ⚛️ **Next.js 15 (App Router)** — TypeScript, Tailwind CSS, React Query  
-- 🐘 **SQLite** — local database  
-- ☁️ **Deploy target:** Azure Container App (API) + Vercel (Web)
+- **.NET 10, Next.js 15, SQLite** — Minimal API, EF Core 10, Ardalis.Specification  
 
 ---
 
-## 🧩 Structure
+## Structure
 ```
 showcase/
 │
@@ -30,46 +27,31 @@ showcase/
 
 ---
 
-## 🚀 Local Development
+## Local Development (arch linux, omarchy version, 3.3.0 i think, January 2026)
 
-### Prerequisites
-- Node.js ≥ 20  
-- .NET SDK 10  
-- pnpm (`npm i -g pnpm` or `corepack enable && corepack prepare pnpm@9 --activate`)
-
-### 1️⃣ Start the API
+### BACKEND
+Requirements:
+```
+dotnet-sdk
+aspnet-runtime
+aspnet-targeting-pack (?)
+```
 ```bash
 cd apps/api
 dotnet run --project Api.Web --urls http://localhost:8080
 ```
 
-Endpoints:
-- `GET /health` → `{ "status": "ok" }`
-- `GET /projects` → Seeded project list
-- Swagger: [http://localhost:8080/swagger](http://localhost:8080/swagger)
-
-> If you hit CORS issues, check `AllowedOrigin` in `Api.Web/appsettings.Development.json`.
-
-### 2️⃣ Start the Web App
+### FRONTEND
+Requirements:
+```
+- Node.js ≥ 20  
+- .NET SDK 10  
+- pnpm (`npm i -g pnpm` or `corepack enable && corepack prepare pnpm@9 --activate`)
+```
 ```bash
 cd apps/web
-pnpm install
-pnpm dev
+npm run dev
 ```
-
-Then open [http://localhost:3000](http://localhost:3000).  
-The `/portfolio` page pulls data from the API.
-
----
-
-## 🧱 Project Philosophy
-This repository is a **personal showcase and experimentation playground** that blends:
-
-- Clean backend architecture in .NET (no MediatR, no AutoMapper)  
-- Modern frontend practices (App Router, React Query, Tailwind)  
-- Ready-to-deploy infrastructure layout  
-
-> **Goal:** A full-stack foundation that scales from a personal site → production demos → client projects.
 
 ---
 
@@ -86,13 +68,13 @@ This repository is a **personal showcase and experimentation playground** that b
 
 ---
 
-## 🌱 Seeding
+## Seeding
 The API auto-seeds one project (`clean-architecture-blueprint`) if the database is empty.  
 Data is stored in `app.db` under `Api.Web`. Delete it anytime to re-seed.
 
 ---
 
-## 🔒 Environment Variables
+## Environment Variables
 
 **`apps/web/.env.local`**
 ```
@@ -110,7 +92,7 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
 
 ---
 
-## 🧭 Next Steps
+## Next Steps
 - Add `/portfolio/[slug]` route for detailed case studies (MDX or API)  
 - Implement live demo endpoints (e.g., Pathfinding, AI integrations)  
 - Add Dockerfile + GitHub Actions for Azure/Vercel deployments  
@@ -119,7 +101,7 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
 
 ---
 
-## 🧠 Troubleshooting
+## Troubleshooting
 
 | Issue | Likely Fix |
 |-------|-------------|
@@ -131,12 +113,12 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
 
 ---
 
-## 🧾 License
+## License
 MIT — do whatever you want; credit link appreciated.
 
 ---
 
-## 👤 Author
+## Author
 **Tămaș Cosmin** but you can call me Tom  
 .NET / Full-Stack Developer
 [LinkedIn](https://www.linkedin.com/in/tamascosmin) • [GitHub](https://github.com/CsmnTms)

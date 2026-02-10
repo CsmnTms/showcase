@@ -85,6 +85,22 @@ body {
 
   /* Inputs */
   .select { @apply ml-2 rounded border border-neutral-300 bg-white px-2 py-1 text-sm text-neutral-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100; }
+
+  /* Tetris Game */
+  .tetris-board { @apply inline-block border-2 border-neutral-700 bg-neutral-900 rounded-lg overflow-hidden shadow-lg; }
+  .tetris-preview { @apply inline-block; }
+  
+  .tetris-cell { @apply w-7 h-7 border border-neutral-800/50 transition-colors; }
+  .tetris-cell-small { @apply w-6 h-6 border border-neutral-800/50; }
+  
+  .tetris-empty { @apply bg-neutral-950; }
+  .tetris-i { @apply bg-cyan-500 border-cyan-400; }
+  .tetris-o { @apply bg-yellow-500 border-yellow-400; }
+  .tetris-t { @apply bg-purple-500 border-purple-400; }
+  .tetris-s { @apply bg-green-500 border-green-400; }
+  .tetris-z { @apply bg-red-500 border-red-400; }
+  .tetris-j { @apply bg-blue-500 border-blue-400; }
+  .tetris-l { @apply bg-orange-500 border-orange-400; }
 }
 
 /* VS Code-like scrollbars for editor textareas (global to avoid hydration issues) */

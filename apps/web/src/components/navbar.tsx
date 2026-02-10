@@ -70,6 +70,9 @@ export default function Navbar() {
                   <Link href="/json-formatter" className="menu-item" onClick={() => setToolsOpen(false)}>
                     JSON Formatter
                   </Link>
+                  <Link href="/tetris" className="menu-item" onClick={() => setToolsOpen(false)}>
+                    Tetris
+                  </Link>
                   {/* Future tools can be added here */}
                 </div>
               </div>
@@ -107,6 +110,7 @@ export default function Navbar() {
                   {/* Show tools directly as items on mobile */}
                   <span className="px-3 py-1 text-xs font-medium text-neutral-500">Tools</span>
                   <Link href="/json-formatter" className="menu-item" onClick={() => setMenuOpen(false)}>JSON Formatter</Link>
+                  <Link href="/tetris" className="menu-item" onClick={() => setMenuOpen(false)}>Tetris</Link>
                   <div className="h-px bg-neutral-200 my-1" />
                   <Link href="/about" className="menu-item" onClick={() => setMenuOpen(false)}>About</Link>
                 </div>
