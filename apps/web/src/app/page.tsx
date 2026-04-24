@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { AscFrame, SecH } from '@/components/kit';
 import ProjectsPreview from '@/components/projects-preview';
+import MessagesTerminal from '@/components/messages-terminal';
 
 export default function Home() {
   return (
@@ -61,22 +62,9 @@ export default function Home() {
         <ProjectsPreview />
       </section>
 
-      {/* ── Writing ──────────────────────────────────────────── */}
+      {/* ── Messages ─────────────────────────────────────────── */}
       <section style={{ marginTop: 52 }}>
-        <SecH level={2}>writing</SecH>
-        <AscFrame title="blog.md">
-          <div className="writing-placeholder">
-            <span style={{ color: 'var(--ink-4)' }}>$ git log --oneline blog/</span>
-            <span style={{ marginTop: 4 }}>
-              fatal: your path spec &apos;blog/&apos; did not match any files
-            </span>
-            <span style={{ marginTop: 4, color: 'var(--ink-4)' }}>
-              <span style={{ color: 'var(--olive)' }}>user@tecdev</span>
-              :~$&nbsp;
-              <span className="blink" style={{ color: 'var(--rust)' }}>▌</span>
-            </span>
-          </div>
-        </AscFrame>
+        <MessagesTerminal />
       </section>
 
       {/* ── Footer ───────────────────────────────────────────── */}
