@@ -1,0 +1,21 @@
+# tecdev — portfolio
+
+> Personal portfolio of Tămaș E. Cosmin, software developer.
+> .NET · TypeScript · full-stack · Next.js
+
+## Links
+
+- [Home](https://csmntms.github.io/showcase/)
+- [Projects](https://csmntms.github.io/showcase/portfolio/)
+- [About](https://csmntms.github.io/showcase/about/)
+- [Tools](https://csmntms.github.io/showcase/tetris/)
+
+## Contact
+
+- Email: csmntamas97@gmail.com
+- GitHub: https://github.com/CsmnTms
+
+## Site
+
+Built with Next.js (static export). No trackers, no cookies.
+Source: https://github.com/CsmnTms/showcase

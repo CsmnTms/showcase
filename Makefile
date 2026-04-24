@@ -1,7 +1,5 @@
 dev:
-\tcd apps/api && dotnet run & \\
-\tcd apps/web && pnpm dev
+	cd apps/web && pnpm dev
 
-test:
-\tdotnet test || true
-\tpnpm -C apps/web test || true
+build:
+	cd apps/web && pnpm build
