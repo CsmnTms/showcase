@@ -3,121 +3,129 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
-// this too?
+const TOOLS = [
+  { label: 'json-formatter', href: '/json-formatter' },
+  { label: 'tetris',         href: '/tetris' },
+];
+
 export default function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement | null>(null);
   const [toolsOpen, setToolsOpen] = useState(false);
-  const toolsRef = useRef<HTMLDivElement | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const toolsRef  = useRef<HTMLDivElement>(null);
+  const mobileRef = useRef<HTMLDivElement>(null);
+  const [time, setTime] = useState('');
 
   useEffect(() => {
-    function onClickOutside(e: MouseEvent) {
-      const target = e.target as Node;
-      const clickedOutsideMobile = menuRef.current && !menuRef.current.contains(target);
-      const clickedOutsideTools = toolsRef.current && !toolsRef.current.contains(target);
-      // If clicking outside either menu, close them.
-      if (clickedOutsideMobile) setMenuOpen(false);
-      if (clickedOutsideTools) setToolsOpen(false);
+    const fmt = () => {
+      const now = new Date();
+      const hh  = now.getHours().toString().padStart(2, '0');
+      const mm  = now.getMinutes().toString().padStart(2, '0');
+      const mon = now.toLocaleString('en', { month: 'short' }).toLowerCase();
+      setTime(`${hh}:${mm} · ${mon} ${now.getDate()}`);
+    };
+    fmt();
+    const id = setInterval(fmt, 30_000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    function onDown(e: MouseEvent) {
+      if (toolsRef.current  && !toolsRef.current.contains(e.target as Node))  setToolsOpen(false);
+      if (mobileRef.current && !mobileRef.current.contains(e.target as Node)) setMobileOpen(false);
     }
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        setMenuOpen(false);
-        setToolsOpen(false);
-      }
+      if (e.key === 'Escape') { setToolsOpen(false); setMobileOpen(false); }
     }
-    document.addEventListener('mousedown', onClickOutside);
-    document.addEventListener('keydown', onKey);
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown',   onKey);
     return () => {
-      document.removeEventListener('mousedown', onClickOutside);
-      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown',   onKey);
     };
   }, []);
 
   return (
-    <header className="header-surface">
-      <div className="nav-container flex items-center justify-between">
-        <Link href="/" aria-label="Home" className="group inline-flex items-center gap-2 shrink-0">
-          {/* Name + subtitle bottom-aligned */}
-          <span className="brand">
-            <span className="brand-title">
-              ^showcase
-            </span>
-            <span className="subtitle">by Tămaș Cosmin</span>
-          </span>
+    <header className="site-nav">
+      {/* Left: brand + links */}
+      <div className="site-nav-left">
+        <Link href="/" className="site-nav-brand">
+          <span style={{ color: 'var(--rust)' }}>●</span>&nbsp;tecdev.sh
         </Link>
-        {/* Desktop */}
-        <nav className="hidden md:flex items-center gap-6">
-          <Link href="/portfolio" className="nav-link">Portfolio</Link>
-          {/* Replaced Blog with Tools dropdown */}
-          <div ref={toolsRef} className="relative">
+        <span className="site-nav-sep">│</span>
+
+        {/* Desktop nav */}
+        <nav className="site-nav-links hidden md:flex">
+          <Link href="/" className="nav-item">[~/home]</Link>
+          <Link href="/portfolio" className="nav-item">[projects]</Link>
+
+          {/* Tools dropdown */}
+          <div ref={toolsRef} className="nav-item-wrap">
             <button
-              type="button"
-              className="nav-link inline-flex items-center gap-1"
+              className="nav-item"
               aria-haspopup="menu"
               aria-expanded={toolsOpen}
-              aria-controls="desktop-tools-menu"
               onClick={() => setToolsOpen(o => !o)}
             >
-              Tools
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                <path strokeWidth="2" strokeLinecap="round" d="M6 9l6 6 6-6" />
-              </svg>
+              [tools&nbsp;{toolsOpen ? '▴' : '▾'}]
             </button>
             {toolsOpen && (
-              <div id="desktop-tools-menu" className="menu">
-                <div className="flex flex-col py-1">
-                  {/* JSON Formatter routes to /json-formatter as requested */}
-                  <Link href="/json-formatter" className="menu-item" onClick={() => setToolsOpen(false)}>
-                    JSON Formatter
+              <div className="nav-dropdown" role="menu">
+                {TOOLS.map(t => (
+                  <Link
+                    key={t.href}
+                    href={t.href}
+                    className="nav-dropdown-item"
+                    onClick={() => setToolsOpen(false)}
+                  >
+                    ▸&nbsp;{t.label}
                   </Link>
-                  <Link href="/tetris" className="menu-item" onClick={() => setToolsOpen(false)}>
-                    Tetris
-                  </Link>
-                  {/* Future tools can be added here */}
-                </div>
+                ))}
               </div>
             )}
           </div>
-          <Link href="/about" className="nav-link">About</Link>
-        </nav>
-        {/* Mobile */}
-        <nav className="flex md:hidden items-center gap-2">
-          <Link href="/portfolio" className="nav-link py-2">Portfolio</Link>
 
-          <div ref={menuRef} className="relative">
-            <button
-              type="button"
-              aria-label="Toggle menu"
-              aria-expanded={menuOpen}
-              aria-controls="mobile-menu"
-              onClick={() => setMenuOpen((o) => !o)}
-              className="icon-btn"
-            >
-              {menuOpen ? (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                  <path strokeWidth="2" strokeLinecap="round" d="M6 6l12 12M18 6l-12 12" />
-                </svg>
-              ) : (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                  <path strokeWidth="2" strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
-                </svg>
-              )}
-            </button>
-
-            {menuOpen && (
-              <div id="mobile-menu" className="menu">
-                <div className="flex flex-col py-1">
-                  {/* Show tools directly as items on mobile */}
-                  <span className="px-3 py-1 text-xs font-medium text-neutral-500">Tools</span>
-                  <Link href="/json-formatter" className="menu-item" onClick={() => setMenuOpen(false)}>JSON Formatter</Link>
-                  <Link href="/tetris" className="menu-item" onClick={() => setMenuOpen(false)}>Tetris</Link>
-                  <div className="h-px bg-neutral-200 my-1" />
-                  <Link href="/about" className="menu-item" onClick={() => setMenuOpen(false)}>About</Link>
-                </div>
-              </div>
-            )}
-          </div>
+          <Link href="/about" className="nav-item">[about]</Link>
         </nav>
+      </div>
+
+      {/* Right: clock (desktop) + mobile hamburger */}
+      <div className="flex items-center gap-3">
+        {time && (
+          <span
+            className="hidden md:block"
+            style={{ color: 'var(--ink-4)', fontFamily: 'var(--mono)', fontSize: 11 }}
+          >
+            {time}
+          </span>
+        )}
+
+        {/* Mobile hamburger */}
+        <div ref={mobileRef} className="relative md:hidden">
+          <button
+            className="nav-item"
+            aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen(o => !o)}
+          >
+            {mobileOpen ? '[×]' : '[≡]'}
+          </button>
+
+          {mobileOpen && (
+            <div className="nav-mobile-menu" role="menu">
+              <Link href="/"          className="nav-mobile-item" onClick={() => setMobileOpen(false)}>▸ ~/home</Link>
+              <Link href="/portfolio" className="nav-mobile-item" onClick={() => setMobileOpen(false)}>▸ projects</Link>
+              <div className="nav-mobile-sep" />
+              <span className="nav-mobile-label">tools</span>
+              {TOOLS.map(t => (
+                <Link key={t.href} href={t.href} className="nav-mobile-item" onClick={() => setMobileOpen(false)}>
+                  ▸&nbsp;{t.label}
+                </Link>
+              ))}
+              <div className="nav-mobile-sep" />
+              <Link href="/about" className="nav-mobile-item" onClick={() => setMobileOpen(false)}>▸ about</Link>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

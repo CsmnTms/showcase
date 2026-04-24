@@ -1,13 +1,13 @@
 import type { NextConfig } from "next";
-const isProjectPage = true; // set true if deploying to https://<user>.github.io/<repo>
-const repo = 'showcase';    // your repo name
+const isProjectPage = true;
+const repo = 'showcase';
 
 const nextConfig: NextConfig = {
-  output: 'export', // enables static export
-  images: { unoptimized: true }, // required for next/image on static hosts
+  output: 'export',
+  images: { unoptimized: true },
   basePath: isProjectPage ? `/${repo}` : undefined,
   assetPrefix: isProjectPage ? `/${repo}/` : undefined,
-  trailingSlash: true, // safer for GH Pages (serves index.html in folders)
+  trailingSlash: true,
   reactCompiler: true,
 };
 

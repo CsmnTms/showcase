@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { WinBar, AscFrame, SecH } from '@/components/kit';
 
 // Types
 type TetrominoType = 'I' | 'O' | 'T' | 'S' | 'Z' | 'J' | 'L';
@@ -240,6 +241,7 @@ export default function TetrisPage() {
     }
     
     if (currentPiece) {
+      setScore(prev => prev + dropDistance * 2);
       lockPiece(currentPiece);
       spawnNewPiece();
     }
@@ -368,146 +370,141 @@ export default function TetrisPage() {
   const nextPieceBoard = renderNextPiece();
 
   return (
-    <main className="container">
-      <div className="mb-5">
-        <h1 className="heading">Tetris</h1>
-        <p className="mt-2 muted">
-          Classic Tetris game. Use arrow keys to move, up arrow or W to rotate, space for hard drop, and P to pause.
+    <main className="page-wrap">
+      <div style={{ marginBottom: 24 }}>
+        <SecH level={1} style={{ marginBottom: 6 }}>tetris</SecH>
+        <p style={{ color: 'var(--ink-3)', fontFamily: 'var(--mono)', fontSize: 12 }}>
+          ← → move &nbsp;·&nbsp; ↑ / W rotate &nbsp;·&nbsp; space hard-drop &nbsp;·&nbsp; P pause
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
-        {/* Game area */}
-        <section className="card">
-          {gameStatus === 'idle' && (
-            <div className="flex flex-col items-center justify-center min-h-[500px]">
-              <h2 className="text-2xl font-bold mb-4">Ready to Play?</h2>
-              <button onClick={startGame} className="btn btn-primary">
-                Start Game
-              </button>
-            </div>
-          )}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-6">
+        {/* Board */}
+        <div style={{ border: '1px solid var(--rule-2)' }}>
+          <WinBar
+            title="tetris.exe"
+            right={
+              gameStatus === 'playing' || gameStatus === 'paused' ? (
+                <div className="flex gap-2">
+                  <button onClick={togglePause} className="btn ghost" style={{ fontSize: 11, padding: '2px 8px' }}>
+                    {gameStatus === 'paused' ? '▶ resume' : '⏸ pause'}
+                  </button>
+                  <button onClick={startGame} className="btn danger" style={{ fontSize: 11, padding: '2px 8px' }}>
+                    restart
+                  </button>
+                </div>
+              ) : null
+            }
+          />
 
-          {gameStatus === 'gameover' && (
-            <div className="flex flex-col items-center justify-center min-h-[500px]">
-              <h2 className="text-2xl font-bold mb-2">Game Over!</h2>
-              <p className="text-lg mb-4 muted">Final Score: {score}</p>
-              <button onClick={startGame} className="btn btn-primary">
-                Play Again
-              </button>
-            </div>
-          )}
-
-          {(gameStatus === 'playing' || gameStatus === 'paused') && (
-            <div className="flex flex-col items-center">
-              {/* Game controls */}
-              <div className="flex gap-2 mb-4">
-                <button 
-                  onClick={togglePause} 
-                  className="btn btn-neutral"
-                  aria-label={gameStatus === 'paused' ? 'Resume' : 'Pause'}
-                >
-                  {gameStatus === 'paused' ? '▶ Resume' : '⏸ Pause'}
-                </button>
-                <button onClick={startGame} className="btn btn-danger">
-                  🔄 Restart
+          <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {gameStatus === 'idle' && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '64px 0' }}>
+                <div aria-label="tetris" style={{ lineHeight: 1 }}>
+                  <span style={{
+                    fontFamily: 'var(--mono)',
+                    fontSize: 42,
+                    fontWeight: 700,
+                    color: 'var(--olive)',
+                    letterSpacing: '-0.04em',
+                    lineHeight: 1,
+                  }}>
+                    <span style={{ color: 'var(--ink-3)', fontWeight: 400 }}>[</span>
+                    {' tetris '}
+                    <span style={{ color: 'var(--ink-3)', fontWeight: 400 }}>]</span>
+                  </span>
+                </div>
+                <button onClick={startGame} className="btn primary">
+                  [ start game ]
                 </button>
               </div>
+            )}
 
-              {/* Game board */}
-              <div className="relative mb-4">
-                {gameStatus === 'paused' && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-10 rounded">
-                    <div className="text-3xl font-bold">PAUSED</div>
-                  </div>
-                )}
-                
-                <div className="tetris-board">
-                  {displayBoard.map((row, y) => (
-                    <div key={y} className="flex">
-                      {row.map((cell, x) => (
-                        <div
-                          key={`${y}-${x}`}
-                          className={`tetris-cell ${cell ? `tetris-${cell.toLowerCase()}` : 'tetris-empty'}`}
-                        />
-                      ))}
+            {gameStatus === 'gameover' && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '48px 0' }}>
+                <p style={{ fontFamily: 'var(--mono)', color: 'var(--rust)', fontSize: 18, fontWeight: 700 }}>
+                  game over
+                </p>
+                <p style={{ fontFamily: 'var(--mono)', color: 'var(--ink-2)', fontSize: 13 }}>
+                  score: {score}
+                </p>
+                <button onClick={startGame} className="btn primary">
+                  [ play again ]
+                </button>
+              </div>
+            )}
+
+            {(gameStatus === 'playing' || gameStatus === 'paused') && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ position: 'relative' }}>
+                  {gameStatus === 'paused' && (
+                    <div style={{
+                      position: 'absolute', inset: 0, zIndex: 10,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: 'rgba(29,27,24,0.75)', backdropFilter: 'blur(2px)',
+                    }}>
+                      <span style={{ fontFamily: 'var(--mono)', color: 'var(--mustard)', fontSize: 22, fontWeight: 700 }}>
+                        [ paused ]
+                      </span>
                     </div>
+                  )}
+                  <div className="tetris-board">
+                    {displayBoard.map((row, y) => (
+                      <div key={y} className="tetris-row">
+                        {row.map((cell, x) => (
+                          <div
+                            key={`${y}-${x}`}
+                            className={`tetris-cell ${cell ? `tetris-${cell.toLowerCase()}` : 'tetris-empty'}`}
+                          />
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Mobile controls */}
+                <div className="flex flex-wrap gap-2 justify-center md:hidden" style={{ marginTop: 12 }}>
+                  {[
+                    { label: '←', action: () => movePiece(-1, 0), a11y: 'move left' },
+                    { label: '→', action: () => movePiece(1, 0),  a11y: 'move right' },
+                    { label: '↻', action: rotatePiece,            a11y: 'rotate' },
+                    { label: '↓', action: dropPiece,              a11y: 'soft drop' },
+                    { label: '⇊', action: hardDrop,               a11y: 'hard drop' },
+                  ].map(({ label, action, a11y }) => (
+                    <button key={a11y} onClick={action} className="btn ghost" aria-label={a11y}>
+                      {label}
+                    </button>
                   ))}
                 </div>
               </div>
+            )}
+          </div>
+        </div>
 
-              {/* Mobile controls */}
-              <div className="flex flex-wrap gap-2 justify-center md:hidden">
-                <button
-                  onClick={() => movePiece(-1, 0)}
-                  className="btn btn-neutral px-6"
-                  aria-label="Move left"
-                >
-                  ←
-                </button>
-                <button
-                  onClick={() => movePiece(1, 0)}
-                  className="btn btn-neutral px-6"
-                  aria-label="Move right"
-                >
-                  →
-                </button>
-                <button
-                  onClick={rotatePiece}
-                  className="btn btn-neutral px-6"
-                  aria-label="Rotate"
-                >
-                  ↻
-                </button>
-                <button
-                  onClick={dropPiece}
-                  className="btn btn-neutral px-6"
-                  aria-label="Soft drop"
-                >
-                  ↓
-                </button>
-                <button
-                  onClick={hardDrop}
-                  className="btn btn-neutral px-6"
-                  aria-label="Hard drop"
-                >
-                  ⇊
-                </button>
-              </div>
-            </div>
-          )}
-        </section>
-
-        {/* Info panel */}
+        {/* Sidebar */}
         {(gameStatus === 'playing' || gameStatus === 'paused') && (
-          <aside className="space-y-4">
-            {/* Score */}
-            <div className="card">
-              <h3 className="font-semibold mb-3">Score</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="muted">Points:</span>
-                  <span className="font-mono font-bold">{score}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="muted">Level:</span>
-                  <span className="font-mono font-bold">{level}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="muted">Lines:</span>
-                  <span className="font-mono font-bold">{linesCleared}</span>
-                </div>
+          <aside style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <AscFrame title="score">
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 12.5, lineHeight: 2.2 }}>
+                {[
+                  ['pts',   String(score)],
+                  ['lvl',   String(level)],
+                  ['lines', String(linesCleared)],
+                ].map(([k, v]) => (
+                  <div key={k} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: 'var(--ink-3)' }}>{k}</span>
+                    <span style={{ color: 'var(--ink)', fontWeight: 700 }}>{v}</span>
+                  </div>
+                ))}
               </div>
-            </div>
+            </AscFrame>
 
-            {/* Next piece */}
             {nextPieceBoard && (
-              <div className="card">
-                <h3 className="font-semibold mb-3">Next</h3>
-                <div className="flex justify-center">
+              <AscFrame title="next">
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
                   <div className="tetris-preview">
                     {nextPieceBoard.map((row, y) => (
-                      <div key={y} className="flex">
+                      <div key={y} className="tetris-row">
                         {row.map((cell, x) => (
                           <div
                             key={`${y}-${x}`}
@@ -518,35 +515,25 @@ export default function TetrisPage() {
                     ))}
                   </div>
                 </div>
-              </div>
+              </AscFrame>
             )}
 
-            {/* Controls help */}
-            <div className="card">
-              <h3 className="font-semibold mb-3">Controls</h3>
-              <div className="space-y-1 text-sm muted">
-                <div className="flex justify-between">
-                  <span>Move:</span>
-                  <span className="font-mono">← →</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Rotate:</span>
-                  <span className="font-mono">↑ / W</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Soft drop:</span>
-                  <span className="font-mono">↓</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Hard drop:</span>
-                  <span className="font-mono">Space</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Pause:</span>
-                  <span className="font-mono">P</span>
-                </div>
+            <AscFrame title="controls">
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 11, lineHeight: 2, color: 'var(--ink-2)' }}>
+                {[
+                  ['move',      '← →'],
+                  ['rotate',    '↑ / W'],
+                  ['soft drop', '↓'],
+                  ['hard drop', 'space'],
+                  ['pause',     'P'],
+                ].map(([k, v]) => (
+                  <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                    <span style={{ color: 'var(--ink-3)' }}>{k}</span>
+                    <span>{v}</span>
+                  </div>
+                ))}
               </div>
-            </div>
+            </AscFrame>
           </aside>
         )}
       </div>

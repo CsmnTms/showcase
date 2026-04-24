@@ -26,10 +26,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
           version: 9
 
@@ -41,17 +41,11 @@ jobs:
 
       - name: Build & Prepare Pages artifact
         env:
-          NEXT_PUBLIC_BASE_PATH: "/showcase"
-          NEXT_PUBLIC_API_BASE_URL: "https://showcase.icyglacier-8096fe38.westeurope.azurecontainerapps.io"
           NEXT_PUBLIC_SITE_URL: "https://csmntms.github.io/showcase"
         run: |
           pnpm --dir apps/web run build
-          # Create .nojekyll so _next/ assets are served
           printf '' > apps/web/out/.nojekyll
-          # SPA fallback so deep links work
           cp apps/web/out/index.html apps/web/out/404.html
-          # Debug
-          ls -la apps/web/out
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

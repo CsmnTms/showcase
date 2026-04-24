@@ -1,3 +1,6 @@
+import { WinBar } from './kit';
+import type { ReactNode } from 'react';
+
 type Props = {
   title: string;
   summary: string;
@@ -7,31 +10,34 @@ type Props = {
 };
 
 export default function ProjectCard({ title, summary, tech = [], tags = [], href }: Props) {
-  // The wrapper is either an anchor (<a>) or a div, so we can narrow its type
   const Wrapper: React.ElementType = href ? 'a' : 'div';
+  const wrapperProps = href
+    ? { href, target: '_blank', rel: 'noopener noreferrer' }
+    : {};
+
+  const barTitle: ReactNode = (
+    <>
+      <span style={{ color: 'var(--ink-4)' }}>~/projects/</span>
+      <span style={{ color: 'var(--ink-2)' }}>{title}</span>
+    </>
+  );
 
   return (
-    <Wrapper
-      {...(href ? { href } : {})}
-      className="block card-lg card-hover"
-    >
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="mt-2 text-sm muted">{summary}</p>
-
-      {(tech.length > 0 || tags.length > 0) && (
-        <div className="mt-4 flex flex-wrap gap-2">
-          {tech.map((t) => (
-            <span key={t} className="badge">
-              {t}
-            </span>
-          ))}
-          {tags.map((t) => (
-            <span key={t} className="tag">
-              {t}
-            </span>
-          ))}
-        </div>
-      )}
+    <Wrapper {...wrapperProps} className="project-card">
+      <WinBar title={barTitle} />
+      <div className="project-card-body">
+        <p className="project-card-summary">{summary}</p>
+        {(tech.length > 0 || tags.length > 0) && (
+          <div className="project-card-tags">
+            {tech.map(t => (
+              <span key={t} className="tag">#{t}</span>
+            ))}
+            {tags.map(t => (
+              <span key={t} className="tag">{t}</span>
+            ))}
+          </div>
+        )}
+      </div>
     </Wrapper>
   );
 }

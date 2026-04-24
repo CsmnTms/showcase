@@ -1,16 +1,17 @@
 [
   {
-    "slug": "my-backend-is-still-work-in-progress",
-    "title": "my backend is still work in progress",
-    "summary": "If my backend is still work in progress, you will see this.",
-    "tech": ["Backend", "Work in Progress"],
-    "tags": ["wip"]
+    "slug": "showcase",
+    "title": "showcase",
+    "summary": "This site. Next.js frontend, static export on GitHub Pages. Playground and portfolio.",
+    "tech": ["Next.js", "TypeScript", "C#", ".NET"],
+    "tags": ["live"],
+    "repoUrl": "https://github.com/CsmnTms/showcase"
   },
   {
     "slug": "placeholder",
-    "title": "Placeholder Project",
-    "summary": "Fallback data to keep the grid populated.",
-    "tech": ["placholder tech", "hold in place technology"],
-    "tags": ["fallback"]
+    "title": "<project>",
+    "summary": "pending sync — check back later.",
+    "tech": ["???"],
+    "tags": ["soon"]
   }
 ]
