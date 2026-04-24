@@ -54,7 +54,7 @@ export default function Navbar() {
         <span className="site-nav-sep">│</span>
 
         {/* Desktop nav */}
-        <nav className="site-nav-links hidden md:flex">
+        <nav className="site-nav-links">
           <Link href="/" className="nav-item">[~/home]</Link>
           <Link href="/portfolio" className="nav-item">[projects]</Link>
 
@@ -88,19 +88,12 @@ export default function Navbar() {
         </nav>
       </div>
 
-      {/* Right: clock (desktop) + mobile hamburger */}
-      <div className="flex items-center gap-3">
-        {time && (
-          <span
-            className="hidden md:block"
-            style={{ color: 'var(--ink-4)', fontFamily: 'var(--mono)', fontSize: 11 }}
-          >
-            {time}
-          </span>
-        )}
+      {/* Right: clock + mobile hamburger */}
+      <div className="site-nav-right">
+        {time && <span className="nav-clock">{time}</span>}
 
         {/* Mobile hamburger */}
-        <div ref={mobileRef} className="relative md:hidden">
+        <div ref={mobileRef} className="nav-mobile-wrap">
           <button
             className="nav-item"
             aria-label="Toggle menu"

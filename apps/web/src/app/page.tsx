@@ -15,8 +15,11 @@ export default function Home() {
               <span className="hero-wordmark__bracket">&lt;</span>tecdev<span className="hero-wordmark__bracket"> /&gt;</span>
             </span>
           </div>
-          <p style={{ fontSize: 15, lineHeight: 1.65, color: 'var(--ink-2)', maxWidth: 460, margin: '0 0 22px' }}>
-            Software Developer.
+          <p style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--ink-3)', margin: '0 0 22px' }}>
+            <span style={{ color: 'var(--rust)', fontWeight: 700 }}>t</span>ămaș{' '}
+            <span style={{ color: 'var(--rust)', fontWeight: 700 }}>e</span>.{' '}
+            <span style={{ color: 'var(--rust)', fontWeight: 700 }}>c</span>osmin<br />
+            software <span style={{ color: 'var(--rust)', fontWeight: 700 }}>dev</span>eloper.
           </p>
           <div className="flex gap-3 flex-wrap">
             <a href="https://github.com/CsmnTms" target="_blank" rel="noopener noreferrer" className="btn ghost">
@@ -35,9 +38,9 @@ export default function Home() {
               @<span style={{ color: 'var(--olive)' }}>tecdev.sh</span>
             </div>
             <div style={{ color: 'var(--rule-2)' }}>────────────────────────</div>
-            <div><span className="whoami-key">role  &nbsp;</span>· .NET dev · full-stack</div>
-            <div><span className="whoami-key">stack &nbsp;</span>· C# · TypeScript · Next.js</div>
-            <div><span className="whoami-key">env   &nbsp;</span>· &lt;placeholder&gt;</div>
+            <div><span className="whoami-key">role  &nbsp;</span>.NET dev · full-stack</div>
+            <div><span className="whoami-key">stack &nbsp;</span>C# · TypeScript · Next.js</div>
+            <div><span className="whoami-key">env   &nbsp;</span>&lt;placeholder&gt;</div>
             <div style={{ color: 'var(--rule-2)', marginTop: 4 }}>────────────────────────</div>
             <div style={{ fontSize: 11, color: 'var(--ink-3)', marginTop: 6, lineHeight: 1.6 }}>
               csmntamas97@gmail.com<br />
