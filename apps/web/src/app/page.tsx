@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { AscFrame, SecH } from '@/components/kit';
 import ProjectsPreview from '@/components/projects-preview';
 import MessagesTerminal from '@/components/messages-terminal';
+import ServerStats from '@/components/server-stats';
 
 export default function Home() {
   return (
@@ -60,6 +61,11 @@ export default function Home() {
           </Link>
         </div>
         <ProjectsPreview />
+      </section>
+
+      {/* ── Server stats ─────────────────────────────────────── */}
+      <section style={{ marginTop: 52 }}>
+        <ServerStats />
       </section>
 
       {/* ── Messages ─────────────────────────────────────────── */}

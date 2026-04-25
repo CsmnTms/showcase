@@ -45,6 +45,7 @@ jobs:
       - name: Build & Prepare Pages artifact
         env:
           NEXT_PUBLIC_SITE_URL: "https://csmntms.github.io/showcase"
+          NEXT_PUBLIC_STATUS_URL: ${{ secrets.STATUS_URL }}
         run: |
           pnpm --dir apps/web run build
           printf '' > apps/web/out/.nojekyll
