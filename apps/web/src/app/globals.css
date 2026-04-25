@@ -477,32 +477,13 @@ html { text-rendering: optimizeLegibility; }
 .kit .blink { animation: blink 1s steps(1) infinite; }
 
 /* ── Server stats widget ─────────────────────────────────────── */
-.kit .server-stats {
-  font-family: var(--mono);
-  font-size: 12px;
-  line-height: 2;
-  color: var(--ink-2);
-}
+/* ── Server Stats ────────────────────────────────────────────── */
 .kit .server-stats__row {
   display: flex;
   align-items: baseline;
-  gap: 0;
 }
-.kit .server-stats__label {
-  color: var(--ink-4);
-  min-width: 52px;
-  flex-shrink: 0;
-}
-.kit .server-stats__bar   { color: var(--rust); }
 .kit .server-stats__dim   { color: var(--ink-4); font-size: 11px; }
-.kit .server-stats__divider { border-top: 1px dashed var(--rule); margin: 3px 0; }
-.kit .server-stats__offline { color: var(--ink-4); }
-.kit .server-stats__prompt {
-  display: flex;
-  align-items: baseline;
-  gap: 0;
-  margin-bottom: 2px;
-}
+.kit .server-stats__sep   { color: var(--ink-4); }
 .kit .server-stats__toggle {
   background: none;
   border: none;

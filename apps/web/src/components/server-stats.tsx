@@ -86,38 +86,35 @@ export default function ServerStats() {
 
   return (
     <AscFrame title="tecdevsrvr" style={{ background: 'var(--bg-1)' }}>
-      <div className="server-stats">
+      <div className="messages-terminal">
 
-        {/* terminal prompt */}
-        <div className="server-stats__prompt">
-          <span style={{ color: 'var(--olive)' }}>tecdev</span>
-          <span style={{ color: 'var(--ink-4)' }}>@tecdevsrvr:~$&nbsp;</span>
-          <span>sysinfo</span>
-          {!offline && display && (
-            <span className="blink" style={{ color: 'var(--rust)', marginLeft: 4 }}>▌</span>
-          )}
-        </div>
+        {/* prompt */}
+        <span className="messages-prompt-line">
+          <span className="messages-prompt-label">
+            <span style={{ color: 'var(--olive)' }}>tecdev</span>
+            <span style={{ color: 'var(--ink-4)' }}>@tecdevsrvr:~$&nbsp;</span>
+          </span>
+          <span style={{ color: 'var(--ink)', whiteSpace: 'pre' }}>what&apos;s my 10yo laptop doing</span>
+          {!display && !offline && <span className="blink" style={{ color: 'var(--rust)' }}>▌</span>}
+        </span>
 
         {offline ? (
-          <div className="server-stats__offline">node offline · retrying…</div>
+          <span style={{ color: 'var(--ink-4)' }}>node offline · retrying…</span>
         ) : !display ? (
-          <div className="server-stats__offline">connecting…</div>
+          <span style={{ color: 'var(--ink-4)' }}>connecting…</span>
         ) : (
           <>
-            <div className="server-stats__divider" />
+            <span>Hello!</span>
+            <span>Struggling as a home server :( stats:</span>
 
-            <div className="server-stats__row">
-              <span className="server-stats__label">uptime</span>
-              <span>{display.uptime.human}</span>
-            </div>
+            <span className="server-stats__sep">---</span>
+            <span style={{ whiteSpace: 'pre' }}>uptime   {display.uptime.human}</span>
 
-            <div className="server-stats__divider" />
-
-            {/* cpu */}
-            <div className="server-stats__row">
-              <span className="server-stats__label">cpu</span>
-              <span className="server-stats__bar">{ascBar(display.cpu.totalPercent)}</span>
-              <span>&nbsp;{n(display.cpu.totalPercent)}%</span>
+            <span className="server-stats__sep">---</span>
+            <span className="server-stats__row">
+              <span style={{ whiteSpace: 'pre' }}>cpu      </span>
+              <span style={{ color: 'var(--rust)' }}>{ascBar(display.cpu.totalPercent)}</span>
+              <span> {n(display.cpu.totalPercent)}%</span>
               {temp !== undefined && (
                 <span className="server-stats__dim">&ensp;{n(temp)}°C</span>
               )}
@@ -128,61 +125,56 @@ export default function ServerStats() {
               >
                 {showCores ? '[-cores]' : '[+cores]'}
               </button>
-            </div>
+            </span>
 
             {showCores && display.cpu.corePercents?.map((pct, i) => (
-              <div key={i} className="server-stats__row">
-                <span className="server-stats__label server-stats__dim">&nbsp;&nbsp;·c{i}</span>
-                <span className="server-stats__bar">{ascBar(pct, 8)}</span>
-                <span className="server-stats__dim">&nbsp;{n(pct)}%</span>
-              </div>
+              <span key={i} className="server-stats__row">
+                <span className="server-stats__dim" style={{ whiteSpace: 'pre' }}>  ·c{i}     </span>
+                <span style={{ color: 'var(--rust)' }}>{ascBar(pct, 8)}</span>
+                <span className="server-stats__dim"> {n(pct)}%</span>
+              </span>
             ))}
 
-            <div className="server-stats__divider" />
-
-            {/* ram */}
-            <div className="server-stats__row">
-              <span className="server-stats__label">ram</span>
-              <span className="server-stats__bar">{ascBar(display.memory.percentUsed)}</span>
-              <span>&nbsp;{n(display.memory.percentUsed)}%</span>
+            <span className="server-stats__sep">---</span>
+            <span className="server-stats__row">
+              <span style={{ whiteSpace: 'pre' }}>ram      </span>
+              <span style={{ color: 'var(--rust)' }}>{ascBar(display.memory.percentUsed)}</span>
+              <span> {n(display.memory.percentUsed)}%</span>
               <span className="server-stats__dim">
                 &ensp;{n(display.memory.usedMb / 1024, 1)} / {n(display.memory.totalMb / 1024, 1)} GB
               </span>
-            </div>
+            </span>
 
-            {/* disks */}
             {display.disks?.length > 0 && (
               <>
-                <div className="server-stats__divider" />
+                <span className="server-stats__sep">---</span>
                 {display.disks.map((d, i) => (
-                  <div key={i} className="server-stats__row">
-                    <span className="server-stats__label">{i === 0 ? 'disk' : ''}</span>
-                    <span className="server-stats__bar">{ascBar(d.percentUsed)}</span>
-                    <span>&nbsp;{n(d.percentUsed)}%</span>
+                  <span key={i} className="server-stats__row">
+                    <span style={{ whiteSpace: 'pre' }}>{i === 0 ? 'disk     ' : '         '}</span>
+                    <span style={{ color: 'var(--rust)' }}>{ascBar(d.percentUsed)}</span>
+                    <span> {n(d.percentUsed)}%</span>
                     <span className="server-stats__dim">
                       &ensp;{n(d.usedGb)} / {n(d.totalGb)} GB
                       {d.mount && <>&nbsp;({d.mount})</>}
                     </span>
-                  </div>
+                  </span>
                 ))}
               </>
             )}
 
-            {/* load */}
             {display.load && (
               <>
-                <div className="server-stats__divider" />
-                <div className="server-stats__row">
-                  <span className="server-stats__label">load</span>
-                  <span className="server-stats__dim">
-                    {n(display.load.one, 2)}&nbsp;·&nbsp;
-                    {n(display.load.five, 2)}&nbsp;·&nbsp;
-                    {n(display.load.fifteen, 2)}
-                    &ensp;<span style={{ fontSize: 10 }}>(1m 5m 15m)</span>
-                  </span>
-                </div>
+                <span className="server-stats__sep">---</span>
+                <span className="server-stats__dim">
+                  load&ensp;{n(display.load.one, 2)}&nbsp;·&nbsp;
+                  {n(display.load.five, 2)}&nbsp;·&nbsp;
+                  {n(display.load.fifteen, 2)}
+                  &ensp;<span style={{ fontSize: 10 }}>(1m 5m 15m)</span>
+                </span>
               </>
             )}
+
+            <span><span className="blink" style={{ color: 'var(--rust)' }}>▌</span></span>
           </>
         )}
 
