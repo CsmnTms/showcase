@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from 'react';
 
 /* ── AscFrame ────────────────────────────────────────────────── */
 type AscFrameProps = {
-  title?: string;
+  title?: ReactNode;
   children: ReactNode;
   style?: CSSProperties;
   className?: string;

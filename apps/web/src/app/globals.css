@@ -449,6 +449,7 @@ html { text-rendering: optimizeLegibility; }
   min-height: 90px;
   overflow-y: auto;
   resize: vertical;
+  outline: none;
 }
 .kit .messages-boot {
   color: var(--ink-4);
@@ -456,7 +457,6 @@ html { text-rendering: optimizeLegibility; }
 .kit .messages-prompt-line {
   display: flex;
   align-items: baseline;
-  flex-wrap: wrap;
   margin-top: 2px;
 }
 .kit .messages-prompt-label {
@@ -494,7 +494,13 @@ html { text-rendering: optimizeLegibility; }
   padding: 0 0 0 8px;
   line-height: inherit;
 }
-.kit .server-stats__toggle:hover { color: var(--rust); }
+.kit .server-stats__live-note {
+  font-size: 9px;
+  color: var(--ink-4);
+  opacity: 0.7;
+  text-align: right;
+  margin-top: 2px;
+}
 
 /* ── Tetris ──────────────────────────────────────────────────── */
 .kit .tetris-board {
