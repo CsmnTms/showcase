@@ -497,6 +497,23 @@ html { text-rendering: optimizeLegibility; }
 .kit .server-stats__dim   { color: var(--ink-4); font-size: 11px; }
 .kit .server-stats__divider { border-top: 1px dashed var(--rule); margin: 3px 0; }
 .kit .server-stats__offline { color: var(--ink-4); }
+.kit .server-stats__prompt {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  margin-bottom: 2px;
+}
+.kit .server-stats__toggle {
+  background: none;
+  border: none;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-4);
+  cursor: pointer;
+  padding: 0 0 0 8px;
+  line-height: inherit;
+}
+.kit .server-stats__toggle:hover { color: var(--rust); }
 
 /* ── Tetris ──────────────────────────────────────────────────── */
 .kit .tetris-board {

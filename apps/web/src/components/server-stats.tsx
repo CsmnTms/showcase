@@ -1,18 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AscFrame } from './kit';
 
 /* ── Types ──────────────────────────────────────────────────── */
-// Matches the actual GET /status response from tecdevsrvr-status-api.
 interface StatusData {
-  uptime:       { seconds: number; human: string };
-  cpu:          { totalPercent: number; corePercents: number[] };
-  memory:       { totalMb: number; usedMb: number; percentUsed: number };
-  disks:        Array<{ mount?: string; totalGb: number; usedGb: number; percentUsed: number }>;
-  load:         { one: number; five: number; fifteen: number };
+  uptime:        { seconds: number; human: string };
+  cpu:           { totalPercent: number; corePercents: number[] };
+  memory:        { totalMb: number; usedMb: number; percentUsed: number };
+  disks:         Array<{ mount?: string; totalGb: number; usedGb: number; percentUsed: number }>;
+  load:          { one: number; five: number; fifteen: number };
   temperatures?: { available: boolean; sensors: Array<{ label: string; celsius: number }> };
-  containers?:  { available: boolean; running: number };
+  containers?:   { available: boolean; running: number };
 }
 
 /* ── Helpers ────────────────────────────────────────────────── */
@@ -21,12 +20,10 @@ function ascBar(pct: number, width = 10): string {
   return '[' + '█'.repeat(filled) + '░'.repeat(width - filled) + ']';
 }
 
-// Safe number formatter — returns '--' for any non-finite/missing value
 function n(val: unknown, decimals = 0): string {
   return typeof val === 'number' && Number.isFinite(val) ? val.toFixed(decimals) : '--';
 }
 
-// Minimal shape validation — throws if required numeric fields are absent
 function validate(d: unknown): StatusData {
   const s = d as StatusData;
   if (typeof s?.cpu?.totalPercent !== 'number') throw new Error('bad shape');
@@ -34,59 +31,106 @@ function validate(d: unknown): StatusData {
   return s;
 }
 
-const STATUS_URL = process.env.NEXT_PUBLIC_STATUS_URL;
+// Apply small realistic noise between polls so the widget feels live
+function nudge(val: number, spread: number): number {
+  return Math.min(100, Math.max(0, val + (Math.random() - 0.5) * 2 * spread));
+}
+
+function flicker(base: StatusData): StatusData {
+  return {
+    ...base,
+    cpu: {
+      ...base.cpu,
+      totalPercent: nudge(base.cpu.totalPercent, 3),
+      corePercents: base.cpu.corePercents?.map(p => nudge(p, 4)),
+    },
+    memory:  { ...base.memory,  percentUsed: nudge(base.memory.percentUsed, 0.3) },
+    temperatures: base.temperatures ? {
+      ...base.temperatures,
+      sensors: base.temperatures.sensors.map(s => ({ ...s, celsius: nudge(s.celsius, 1) })),
+    } : undefined,
+  };
+}
+
+const STATUS_URL  = process.env.NEXT_PUBLIC_STATUS_URL;
+const POLL_MS     = 10_000;
+const FLICKER_MS  = 1_200;
 
 /* ── Component ──────────────────────────────────────────────── */
 export default function ServerStats() {
-  const [data,    setData]    = useState<StatusData | null>(null);
-  const [offline, setOffline] = useState(false);
+  const real                        = useRef<StatusData | null>(null);
+  const [display,    setDisplay]    = useState<StatusData | null>(null);
+  const [offline,    setOffline]    = useState(false);
+  const [showCores,  setShowCores]  = useState(false);
 
   useEffect(() => {
     if (!STATUS_URL) return;
     const poll = () =>
       fetch(`${STATUS_URL}/status`)
         .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-        .then(d => { setData(validate(d)); setOffline(false); })
+        .then(d => { const v = validate(d); real.current = v; setDisplay(v); setOffline(false); })
         .catch(() => setOffline(true));
+
     poll();
-    const id = setInterval(poll, 10_000);
-    return () => clearInterval(id);
+    const pollId    = setInterval(poll, POLL_MS);
+    const flickerId = setInterval(() => {
+      if (real.current) setDisplay(flicker(real.current));
+    }, FLICKER_MS);
+
+    return () => { clearInterval(pollId); clearInterval(flickerId); };
   }, []);
 
   if (!STATUS_URL) return null;
 
-  const temp = data?.temperatures?.sensors?.[0]?.celsius;
+  const temp = display?.temperatures?.sensors?.[0]?.celsius;
 
   return (
     <AscFrame title="tecdevsrvr" style={{ background: 'var(--bg-1)' }}>
       <div className="server-stats">
 
+        {/* terminal prompt */}
+        <div className="server-stats__prompt">
+          <span style={{ color: 'var(--olive)' }}>tecdev</span>
+          <span style={{ color: 'var(--ink-4)' }}>@tecdevsrvr:~$&nbsp;</span>
+          <span>sysinfo</span>
+          {!offline && display && (
+            <span className="blink" style={{ color: 'var(--rust)', marginLeft: 4 }}>▌</span>
+          )}
+        </div>
+
         {offline ? (
-          <span className="server-stats__offline">● node offline</span>
-        ) : !data ? (
-          <span className="server-stats__offline">● connecting…</span>
+          <div className="server-stats__offline">node offline · retrying…</div>
+        ) : !display ? (
+          <div className="server-stats__offline">connecting…</div>
         ) : (
           <>
-            {/* uptime */}
+            <div className="server-stats__divider" />
+
             <div className="server-stats__row">
               <span className="server-stats__label">uptime</span>
-              <span>{data.uptime.human}</span>
+              <span>{display.uptime.human}</span>
             </div>
 
             <div className="server-stats__divider" />
 
-            {/* cpu overall */}
+            {/* cpu */}
             <div className="server-stats__row">
               <span className="server-stats__label">cpu</span>
-              <span className="server-stats__bar">{ascBar(data.cpu.totalPercent)}</span>
-              <span>&nbsp;{n(data.cpu.totalPercent)}%</span>
+              <span className="server-stats__bar">{ascBar(display.cpu.totalPercent)}</span>
+              <span>&nbsp;{n(display.cpu.totalPercent)}%</span>
               {temp !== undefined && (
                 <span className="server-stats__dim">&ensp;{n(temp)}°C</span>
               )}
+              <button
+                className="server-stats__toggle"
+                onClick={() => setShowCores(c => !c)}
+                aria-label="toggle per-core breakdown"
+              >
+                {showCores ? '[-cores]' : '[+cores]'}
+              </button>
             </div>
 
-            {/* per-core */}
-            {data.cpu.corePercents?.map((pct, i) => (
+            {showCores && display.cpu.corePercents?.map((pct, i) => (
               <div key={i} className="server-stats__row">
                 <span className="server-stats__label server-stats__dim">&nbsp;&nbsp;·c{i}</span>
                 <span className="server-stats__bar">{ascBar(pct, 8)}</span>
@@ -99,18 +143,18 @@ export default function ServerStats() {
             {/* ram */}
             <div className="server-stats__row">
               <span className="server-stats__label">ram</span>
-              <span className="server-stats__bar">{ascBar(data.memory.percentUsed)}</span>
-              <span>&nbsp;{n(data.memory.percentUsed)}%</span>
+              <span className="server-stats__bar">{ascBar(display.memory.percentUsed)}</span>
+              <span>&nbsp;{n(display.memory.percentUsed)}%</span>
               <span className="server-stats__dim">
-                &ensp;{n(data.memory.usedMb / 1024, 1)} / {n(data.memory.totalMb / 1024, 1)} GB
+                &ensp;{n(display.memory.usedMb / 1024, 1)} / {n(display.memory.totalMb / 1024, 1)} GB
               </span>
             </div>
 
             {/* disks */}
-            {(data.disks?.length ?? 0) > 0 && (
+            {display.disks?.length > 0 && (
               <>
                 <div className="server-stats__divider" />
-                {data.disks.map((d, i) => (
+                {display.disks.map((d, i) => (
                   <div key={i} className="server-stats__row">
                     <span className="server-stats__label">{i === 0 ? 'disk' : ''}</span>
                     <span className="server-stats__bar">{ascBar(d.percentUsed)}</span>
@@ -124,16 +168,16 @@ export default function ServerStats() {
               </>
             )}
 
-            {/* load average */}
-            {data.load && (
+            {/* load */}
+            {display.load && (
               <>
                 <div className="server-stats__divider" />
                 <div className="server-stats__row">
                   <span className="server-stats__label">load</span>
                   <span className="server-stats__dim">
-                    {n(data.load.one, 2)}&nbsp;·&nbsp;
-                    {n(data.load.five, 2)}&nbsp;·&nbsp;
-                    {n(data.load.fifteen, 2)}
+                    {n(display.load.one, 2)}&nbsp;·&nbsp;
+                    {n(display.load.five, 2)}&nbsp;·&nbsp;
+                    {n(display.load.fifteen, 2)}
                     &ensp;<span style={{ fontSize: 10 }}>(1m 5m 15m)</span>
                   </span>
                 </div>
