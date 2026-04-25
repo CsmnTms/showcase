@@ -4,32 +4,15 @@ import { useEffect, useState } from 'react';
 import { AscFrame } from './kit';
 
 /* ── Types ──────────────────────────────────────────────────── */
-// Mirrors the shape of GET /status from tecdevsrvr-status-api.
-// All optional fields degrade gracefully if the API version differs.
+// Matches the actual GET /status response from tecdevsrvr-status-api.
 interface StatusData {
-  uptime: string;
-  cpu: {
-    overallPercent: number;
-    corePercents?: number[];
-    temperaturesCelsius?: number[];
-  };
-  memory: {
-    usedMb: number;
-    totalMb: number;
-    usedPercent: number;
-  };
-  disks?: Array<{
-    path?: string;
-    label?: string;
-    usedGb: number;
-    totalGb: number;
-    usedPercent: number;
-  }>;
-  loadAverage?: {
-    oneMinute: number;
-    fiveMinute: number;
-    fifteenMinute: number;
-  };
+  uptime:       { seconds: number; human: string };
+  cpu:          { totalPercent: number; corePercents: number[] };
+  memory:       { totalMb: number; usedMb: number; percentUsed: number };
+  disks:        Array<{ mount?: string; totalGb: number; usedGb: number; percentUsed: number }>;
+  load:         { one: number; five: number; fifteen: number };
+  temperatures?: { available: boolean; sensors: Array<{ label: string; celsius: number }> };
+  containers?:  { available: boolean; running: number };
 }
 
 /* ── Helpers ────────────────────────────────────────────────── */
@@ -46,8 +29,8 @@ function n(val: unknown, decimals = 0): string {
 // Minimal shape validation — throws if required numeric fields are absent
 function validate(d: unknown): StatusData {
   const s = d as StatusData;
-  if (typeof s?.cpu?.overallPercent !== 'number') throw new Error('bad shape');
-  if (typeof s?.memory?.usedPercent !== 'number') throw new Error('bad shape');
+  if (typeof s?.cpu?.totalPercent !== 'number') throw new Error('bad shape');
+  if (typeof s?.memory?.percentUsed !== 'number') throw new Error('bad shape');
   return s;
 }
 
@@ -72,7 +55,7 @@ export default function ServerStats() {
 
   if (!STATUS_URL) return null;
 
-  const temp = data?.cpu.temperaturesCelsius?.[0];
+  const temp = data?.temperatures?.sensors?.[0]?.celsius;
 
   return (
     <AscFrame title="tecdevsrvr" style={{ background: 'var(--bg-1)' }}>
@@ -87,7 +70,7 @@ export default function ServerStats() {
             {/* uptime */}
             <div className="server-stats__row">
               <span className="server-stats__label">uptime</span>
-              <span>{data.uptime}</span>
+              <span>{data.uptime.human}</span>
             </div>
 
             <div className="server-stats__divider" />
@@ -95,8 +78,8 @@ export default function ServerStats() {
             {/* cpu overall */}
             <div className="server-stats__row">
               <span className="server-stats__label">cpu</span>
-              <span className="server-stats__bar">{ascBar(data.cpu.overallPercent)}</span>
-              <span>&nbsp;{n(data.cpu.overallPercent)}%</span>
+              <span className="server-stats__bar">{ascBar(data.cpu.totalPercent)}</span>
+              <span>&nbsp;{n(data.cpu.totalPercent)}%</span>
               {temp !== undefined && (
                 <span className="server-stats__dim">&ensp;{n(temp)}°C</span>
               )}
@@ -116,8 +99,8 @@ export default function ServerStats() {
             {/* ram */}
             <div className="server-stats__row">
               <span className="server-stats__label">ram</span>
-              <span className="server-stats__bar">{ascBar(data.memory.usedPercent)}</span>
-              <span>&nbsp;{n(data.memory.usedPercent)}%</span>
+              <span className="server-stats__bar">{ascBar(data.memory.percentUsed)}</span>
+              <span>&nbsp;{n(data.memory.percentUsed)}%</span>
               <span className="server-stats__dim">
                 &ensp;{n(data.memory.usedMb / 1024, 1)} / {n(data.memory.totalMb / 1024, 1)} GB
               </span>
@@ -127,14 +110,14 @@ export default function ServerStats() {
             {(data.disks?.length ?? 0) > 0 && (
               <>
                 <div className="server-stats__divider" />
-                {data.disks!.map((d, i) => (
+                {data.disks.map((d, i) => (
                   <div key={i} className="server-stats__row">
                     <span className="server-stats__label">{i === 0 ? 'disk' : ''}</span>
-                    <span className="server-stats__bar">{ascBar(d.usedPercent)}</span>
-                    <span>&nbsp;{n(d.usedPercent)}%</span>
+                    <span className="server-stats__bar">{ascBar(d.percentUsed)}</span>
+                    <span>&nbsp;{n(d.percentUsed)}%</span>
                     <span className="server-stats__dim">
                       &ensp;{n(d.usedGb)} / {n(d.totalGb)} GB
-                      {d.path && <>&nbsp;({d.path})</>}
+                      {d.mount && <>&nbsp;({d.mount})</>}
                     </span>
                   </div>
                 ))}
@@ -142,15 +125,15 @@ export default function ServerStats() {
             )}
 
             {/* load average */}
-            {data.loadAverage && (
+            {data.load && (
               <>
                 <div className="server-stats__divider" />
                 <div className="server-stats__row">
                   <span className="server-stats__label">load</span>
                   <span className="server-stats__dim">
-                    {n(data.loadAverage.oneMinute, 2)}&nbsp;·&nbsp;
-                    {n(data.loadAverage.fiveMinute, 2)}&nbsp;·&nbsp;
-                    {n(data.loadAverage.fifteenMinute, 2)}
+                    {n(data.load.one, 2)}&nbsp;·&nbsp;
+                    {n(data.load.five, 2)}&nbsp;·&nbsp;
+                    {n(data.load.fifteen, 2)}
                     &ensp;<span style={{ fontSize: 10 }}>(1m 5m 15m)</span>
                   </span>
                 </div>
